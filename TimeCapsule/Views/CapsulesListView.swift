@@ -3,7 +3,15 @@ import SwiftData
 
 struct CapsulesListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var capsules: [TimeCapsule]
+    @Query(sort: \TimeCapsule.unlockDate) private var capsules: [TimeCapsule]
+    
+    private var lockedCapsules: [TimeCapsule] {
+        capsules.filter { $0.hasBeenLocked && !$0.canBeUnlocked }
+    }
+    
+    private var unlockedCapsules: [TimeCapsule] {
+        capsules.filter { $0.hasBeenLocked && $0.canBeUnlocked }
+    }
     
     var body: some View {
         NavigationStack {
@@ -17,13 +25,32 @@ struct CapsulesListView: View {
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 16) {
-                            ForEach(capsules) { capsule in
-                                NavigationLink {
-                                    CapsuleFormView(capsule: capsule)
-                                } label: {
-                                    CapsuleListItemView(capsule: capsule)
+                            if !unlockedCapsules.isEmpty {
+                                Section(header: SectionHeaderView(title: "Unlocked")) {
+                                    ForEach(unlockedCapsules) { capsule in
+                                        NavigationLink {
+                                            UnlockedCapsuleView(capsule: capsule)
+                                           
+                                        } label: {
+                                            CapsuleListItemView(capsule: capsule)
+                                        }
+                                    }
                                 }
-                                .disabled(capsule.isLocked)
+                            }
+                            
+                            if !lockedCapsules.isEmpty {
+                                Section(header: SectionHeaderView(title: "Locked")) {
+                                    ForEach(lockedCapsules) { capsule in
+                                        NavigationLink {
+                                            if capsule.canBeUnlocked {
+                                                CapsuleFormView(capsule: capsule)
+                                            }
+                                        } label: {
+                                            CapsuleListItemView(capsule: capsule)
+                                        }
+                                        .disabled(!capsule.canBeUnlocked)
+                                    }
+                                }
                             }
                         }
                         .padding(.vertical)
@@ -41,6 +68,19 @@ struct CapsulesListView: View {
                 }
             }
         }
+    }
+}
+
+struct SectionHeaderView: View {
+    let title: String
+    
+    var body: some View {
+        Text(title)
+            .font(.headline)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+            .padding(.top, 8)
     }
 }
 

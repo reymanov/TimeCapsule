@@ -13,7 +13,7 @@ final class TimeCapsule {
     var title: String
     var creationDate: Date
     var unlockDate: Date
-    var isLocked: Bool
+    @Attribute(originalName: "isLocked") var hasBeenLocked: Bool
     
     var message: String?
     
@@ -29,7 +29,7 @@ final class TimeCapsule {
         self.creationDate = creationDate
         self.unlockDate = unlockDate
         self.message = message
-        self.isLocked = false
+        self.hasBeenLocked = false
         self.lastModifiedDate = creationDate
     }
     

@@ -54,7 +54,7 @@ struct CapsuleFormView: View {
                 }
             }
             
-            if capsule != nil && !capsule!.isLocked {
+            if capsule != nil && !capsule!.hasBeenLocked {
                 Button(action: {
                     showingLockAlert = true
                 }) {
@@ -100,7 +100,7 @@ struct CapsuleFormView: View {
     
     private func lockCapsule() {
         guard let existingCapsule = capsule else { return }
-        existingCapsule.isLocked = true
+        existingCapsule.hasBeenLocked = true
         existingCapsule.updateLastModified()
         dismiss()
     }

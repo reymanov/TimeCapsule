@@ -18,18 +18,17 @@ struct CapsuleListItemView: View {
                     .lineLimit(1)
                     .frame(maxWidth: .infinity)
                 
-                Image(systemName: capsule.isLocked ? "lock.fill" : "lock.open.fill")
+                Image(systemName: capsule.hasBeenLocked && !capsule.canBeUnlocked ? "lock.fill" : "lock.open.fill")
                     .padding(4)
             }
             
-            CountdownTimerView(targetDate: capsule.unlockDate, countdownActive: capsule.isLocked)
+            CountdownTimerView(targetDate: capsule.unlockDate, countdownActive: capsule.hasBeenLocked)
                 .padding(.vertical, 8)
                 .frame(maxWidth: 120)
                 .background(
-                    RoundedRectangle(cornerRadius: 4)
+                    RoundedRectangle(cornerRadius: 16)
                         .fill(.ultraThinMaterial)
                         .shadow(radius: 2)
-                       
                 )
             HStack {
                 Text("Opens \(capsule.unlockDate, format: .dateTime.day().month().year()) at \(capsule.unlockDate, format: .dateTime.hour().minute())")
@@ -42,6 +41,21 @@ struct CapsuleListItemView: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(.ultraThinMaterial)
                 .shadow(radius: 2)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.6),
+                                    Color.gray.opacity(0.4),
+                                    Color.white.opacity(0.6)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 2
+                        )
+                )
         )
         .padding(.horizontal)
         .foregroundColor(.primary)
